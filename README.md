@@ -16,10 +16,8 @@ Recommended structure (no assets folder needed):
 
 ```
 EF234301_WebPro_MID_5025241005_Nuha Usama Okbah_5025241014_Almira Nayla Felisitha_5025241082_Isabel Hayaaulia Ismail/
-├─ Login/
-│  └─ Its Orgs – Auth Page (frontend).html          # login / signup UI (frontend only)
-└─ Directory Page/
-   └─ Its Orgs – Directory Page (frontend).html               # directory + details modal + detail view (single file)
+├─ Login and Directory Page/
+│  └─ Its Orgs – Auth Page, Directory Page(frontend).html          # login / signup UI (frontend only) and directory + details modal + detail view (single file)           
 ```
 
 
@@ -27,204 +25,7 @@ EF234301_WebPro_MID_5025241005_Nuha Usama Okbah_5025241014_Almira Nayla Felisith
 
 The canvas already contains:
 
-Its Orgs – Auth Page (frontend).html (login)
-``` html
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ITS Orgs – Welcome</title>
-
-  <!-- Google Font for aesthetic heading -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Tailwind CSS CDN (no build step) -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            display: ['Playfair Display', 'serif'],
-            sans: ['Inter', 'system-ui', 'sans-serif']
-          },
-          colors: {
-            brand: {
-              50:'#f5f7ff', 100:'#eef2ff', 200:'#e0e7ff', 300:'#c7d2fe',
-              400:'#a5b4fc', 500:'#818cf8', 600:'#6366f1', 700:'#4f46e5', 800:'#4338ca', 900:'#3730a3'
-            }
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    /* subtle animated background */
-    .bg-grid {
-      background-image:
-        radial-gradient(circle at 1px 1px, rgba(99,102,241,.15) 1px, transparent 0);
-      background-size: 24px 24px;
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-white text-slate-800 font-sans">
-  <div class="absolute inset-0 bg-gradient-to-b from-brand-50 via-white to-white pointer-events-none"></div>
-  <div class="relative min-h-screen grid place-items-center px-4 bg-grid">
-    <div class="w-full max-w-md">
-      <!-- Card -->
-      <div class="relative rounded-3xl shadow-xl ring-1 ring-black/5 overflow-hidden bg-white/80 backdrop-blur">
-        <!-- Welcome header -->
-        <div class="px-8 pt-8">
-          <h1 class="font-display text-4xl text-slate-900 tracking-tight text-center">Welcome</h1>
-          <p class="mt-2 text-center text-sm text-slate-500">Sign in or create your account to view organizations in ITS</p>
-        </div>
-
-        <!-- Tabs -->
-        <div class="mt-6 px-2">
-          <div class="mx-6 grid grid-cols-2 rounded-full bg-slate-100 p-1">
-            <button id="tab-signin" class="tab-btn rounded-full py-2 text-sm font-medium transition" data-target="panel-signin">Sign in</button>
-            <button id="tab-signup" class="tab-btn rounded-full py-2 text-sm font-medium transition" data-target="panel-signup">Sign up</button>
-          </div>
-        </div>
-
-        <!-- Panels -->
-        <div class="p-8">
-          <!-- Sign in form -->
-          <form id="panel-signin" class="tab-panel space-y-4" method="post" action="/signin" autocomplete="on" novalidate>
-            <!-- Uncomment this inside Blade: @csrf -->
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Username</label>
-              <input name="username" type="text" required class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500" placeholder="yourusername" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Password</label>
-              <div class="relative">
-                <input id="signin-password" name="password" type="password" required class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500 pr-12" placeholder="••••••••" />
-                <button type="button" class="absolute inset-y-0 right-0 px-3 text-sm text-slate-600" data-toggle-pass="signin-password">Show</button>
-              </div>
-            </div>
-            <div class="flex items-center justify-start pt-2">
-              <label class="inline-flex items-center gap-2 text-sm text-slate-600">
-                <input type="checkbox" name="remember" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"> Remember me
-              </label>
-            </div>
-            <button type="submit" class="w-full rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-medium py-2.5 transition">Sign in</button>
-            <p class="text-center text-sm text-slate-500">No account? <a href="#" data-toggle="panel-signup" class="text-brand-700 hover:underline">Sign up</a></p>
-          </form>
-
-          <!-- Sign up form -->
-          <form id="panel-signup" class="tab-panel hidden space-y-4" method="post" action="/signup" autocomplete="on" novalidate>
-            <!-- Uncomment this inside Blade: @csrf -->
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Username</label>
-              <input name="username" type="text" required class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500" placeholder="choose a username" />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Password</label>
-            <div class="relative">
-              <input id="signup-password" name="password" type="password" required minlength="6" class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500 pr-12" placeholder="create a password" />
-              <button type="button" class="absolute inset-y-0 right-0 px-3 text-sm text-slate-600" data-toggle-pass="signup-password">Show</button>
-            </div>
-            </div>
-            <!-- Optional: confirm password (can be removed if backend doesn't need it) -->
-            <div>
-              <label class="block text-sm font-medium text-slate-700">Confirm Password</label>
-              <div class="relative">
-                <input id="signup-confirm" type="password" required minlength="6" class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500 pr-12" placeholder="repeat your password" />
-                <button type="button" class="absolute inset-y-0 right-0 px-3 text-sm text-slate-600" data-toggle-pass="signup-confirm">Show</button>
-              </div>
-              <p id="confirm-msg" class="mt-1 hidden text-xs text-rose-600">Passwords do not match</p>
-            </div>
-            <button type="submit" class="w-full rounded-xl bg-brand-600 hover:bg-brand-700 active:bg-brand-800 text-white font-medium py-2.5 transition">Create account</button>
-            <p class="text-center text-sm text-slate-500">Already have an account? <a href="#" data-toggle="panel-signin" class="text-brand-700 hover:underline">Sign in</a></p>
-          </form>
-        </div>
-
-        <!-- Footer hint -->
-        <div class="px-8 pb-6">
-          <p class="text-center text-xs text-slate-400">By continuing you agree to our Terms & Privacy Policy</p>
-        </div>
-      </div>
-
-      <!-- Tiny status toast (replace with real flash messages) -->
-      <div id="toast" class="invisible opacity-0 transition-opacity fixed left-1/2 -translate-x-1/2 bottom-6 bg-slate-900 text-white text-sm px-4 py-2 rounded-full shadow-lg"></div>
-    </div>
-  </div>
-
-  <script>
-    // Tabs logic
-    const tabBtns = document.querySelectorAll('.tab-btn');
-    const panels = document.querySelectorAll('.tab-panel');
-
-    function activateTab(targetId){
-      panels.forEach(p => p.id === targetId ? p.classList.remove('hidden') : p.classList.add('hidden'));
-      tabBtns.forEach(btn => {
-        const active = btn.dataset.target === targetId;
-        btn.classList.toggle('bg-white', active);
-        btn.classList.toggle('shadow', active);
-        btn.classList.toggle('text-slate-900', active);
-        btn.classList.toggle('text-slate-500', !active);
-      });
-    }
-
-    // default: show Sign in
-    activateTab('panel-signin');
-
-    tabBtns.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.target)));
-    document.querySelectorAll('[data-toggle]')
-      .forEach(a => a.addEventListener('click', e => { e.preventDefault(); activateTab(a.dataset.toggle) }))
-
-    // Password visibility toggles
-    document.querySelectorAll('[data-toggle-pass]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-toggle-pass');
-        const input = document.getElementById(id);
-        if (!input) return;
-        const isPassword = input.getAttribute('type') === 'password';
-        input.setAttribute('type', isPassword ? 'text' : 'password');
-        btn.textContent = isPassword ? 'Hide' : 'Show';
-      });
-    });
-
-    // Confirm password check
-    const signupForm = document.getElementById('panel-signup');
-    const confirmInput = document.getElementById('signup-confirm');
-    const confirmMsg = document.getElementById('confirm-msg');
-    if (signupForm) {
-      signupForm.addEventListener('submit', (e) => {
-        const pass = signupForm.querySelector('input[name="password"]').value;
-        const confirm = confirmInput.value;
-        if (pass !== confirm) {
-          e.preventDefault();
-          confirmMsg.classList.remove('hidden');
-          confirmInput.classList.add('ring-1','ring-rose-500');
-          showToast('Passwords must match');
-        }
-      });
-      confirmInput.addEventListener('input', () => {
-        confirmMsg.classList.add('hidden');
-        confirmInput.classList.remove('ring-1','ring-rose-500');
-      })
-    }
-
-    // Simple toast for demo
-    function showToast(msg){
-      const t = document.getElementById('toast');
-      t.textContent = msg; t.classList.remove('invisible');
-      requestAnimationFrame(()=>{ t.classList.remove('opacity-0'); t.classList.add('opacity-100'); });
-      setTimeout(()=>{ t.classList.add('opacity-0'); setTimeout(()=> t.classList.add('invisible'), 300); }, 1800);
-    }
-  </script>
-</body>
-</html>
-
-```
-Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
-
+Its Orgs – Auth Page, Directory Page(frontend).html (login and directory page)
 ``` html
 <!doctype html>
 <html lang="en">
@@ -232,6 +33,8 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>ITS Organizations</title>
+
+  <!-- Fonts + Tailwind -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -240,7 +43,7 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     tailwind.config = { theme:{ extend:{
       fontFamily:{ display:['Playfair Display','serif'], sans:['Inter','system-ui','sans-serif'] },
       colors:{ brand:{50:'#f5f7ff',100:'#eef2ff',200:'#e0e7ff',300:'#c7d2fe',400:'#a5b4fc',500:'#818cf8',600:'#6366f1',700:'#4f46e5',800:'#4338ca',900:'#3730a3'} }
-    }}}; 
+    }}};
   </script>
   <style>
     .bg-grid{background-image:radial-gradient(circle at 1px 1px, rgba(99,102,241,.14) 1px, transparent 0);background-size:22px 22px}
@@ -252,12 +55,93 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
 <body class="min-h-screen bg-white text-slate-800 font-sans">
   <div class="absolute inset-0 bg-gradient-to-b from-brand-50 via-white to-white pointer-events-none"></div>
 
-  <!-- DIRECTORY PAGE -->
-  <main id="page-directory" class="page active relative mx-auto max-w-6xl px-4 pb-24 pt-10 bg-grid">
-    <header class="flex flex-col items-center gap-3 text-center">
-      <h1 class="font-display text-4xl tracking-tight text-slate-900">ORGANIZATION</h1>
-      <p class="text-slate-500 text-sm">Browse and discover organizations at ITS. Search, filter, and feature your favorites.</p>
-    </header>
+  <!-- ============ AUTH PAGE (Sign in / Sign up) ============ -->
+  <main id="page-auth" class="page active relative grid min-h-screen place-items-center px-4 bg-grid">
+    <div class="w-full max-w-md">
+      <div class="relative rounded-3xl shadow-xl ring-1 ring-black/5 overflow-hidden bg-white/80 backdrop-blur">
+        <div class="px-8 pt-8">
+          <h1 class="font-display text-4xl text-slate-900 tracking-tight text-center">Welcome</h1>
+          <p class="mt-2 text-center text-sm text-slate-500">Sign in or create your account to view organizations in ITS</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="mt-6 px-2">
+          <div class="mx-6 grid grid-cols-2 rounded-full bg-slate-100 p-1">
+            <button class="tab-btn rounded-full py-2 text-sm font-medium transition" data-target="panel-signin">Sign in</button>
+            <button class="tab-btn rounded-full py-2 text-sm font-medium transition" data-target="panel-signup">Sign up</button>
+          </div>
+        </div>
+
+        <!-- Panels -->
+        <div class="p-8">
+          <!-- Sign in -->
+          <form id="panel-signin" class="tab-panel space-y-4" autocomplete="on" novalidate>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Username</label>
+              <input id="si-username" type="text" required class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500" placeholder="yourusername" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Password</label>
+              <div class="relative">
+                <input id="si-password" type="password" required class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500 pr-12" placeholder="••••••••" />
+                <button type="button" class="showpass absolute inset-y-0 right-0 px-3 text-sm text-slate-600" data-toggle-pass="si-password">Show</button>
+              </div>
+            </div>
+            <label class="inline-flex items-center gap-2 text-sm text-slate-600">
+              <input id="remember-me" type="checkbox" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500"> Remember me
+            </label>
+            <button type="submit" class="w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 transition">Sign in</button>
+            <p class="text-center text-sm text-slate-500">No account? <a href="#" data-toggle="panel-signup" class="text-brand-700 hover:underline">Sign up</a></p>
+          </form>
+
+          <!-- Sign up -->
+          <form id="panel-signup" class="tab-panel hidden space-y-4" autocomplete="on" novalidate>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Username</label>
+              <input id="su-username" type="text" required class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500" placeholder="choose a username" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Password</label>
+              <div class="relative">
+                <input id="su-password" type="password" required minlength="6" class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500 pr-12" placeholder="create a password" />
+                <button type="button" class="showpass absolute inset-y-0 right-0 px-3 text-sm text-slate-600" data-toggle-pass="su-password">Show</button>
+              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-slate-700">Confirm Password</label>
+              <div class="relative">
+                <input id="su-confirm" type="password" required minlength="6" class="mt-1 w-full rounded-xl border-slate-200 focus:border-brand-500 focus:ring-brand-500 pr-12" placeholder="repeat your password" />
+                <button type="button" class="showpass absolute inset-y-0 right-0 px-3 text-sm text-slate-600" data-toggle-pass="su-confirm">Show</button>
+              </div>
+              <p id="confirm-msg" class="mt-1 hidden text-xs text-rose-600">Passwords do not match</p>
+            </div>
+            <button type="submit" class="w-full rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-medium py-2.5 transition">Create account</button>
+            <p class="text-center text-sm text-slate-500">Already have an account? <a href="#" data-toggle="panel-signin" class="text-brand-700 hover:underline">Sign in</a></p>
+          </form>
+        </div>
+
+        <div class="px-8 pb-6">
+          <p class="text-center text-xs text-slate-400">By continuing you agree to our Terms & Privacy Policy</p>
+        </div>
+      </div>
+
+      <div id="toast" class="invisible opacity-0 transition-opacity fixed left-1/2 -translate-x-1/2 bottom-6 bg-slate-900 text-white text-sm px-4 py-2 rounded-full shadow-lg"></div>
+    </div>
+  </main>
+
+  <!-- ============ DIRECTORY PAGE ============ -->
+  <main id="page-directory" class="page relative mx-auto max-w-6xl px-4 pb-24 pt-10 bg-grid">
+    <!-- top row: title + logout -->
+    <div class="flex items-start justify-between">
+      <header class="flex flex-col items-center gap-3 text-center mx-auto">
+        <h1 class="font-display text-4xl tracking-tight text-slate-900">ORGANIZATION</h1>
+        <p class="text-slate-500 text-sm">Browse and discover organizations at ITS. Search, filter, and feature your favorites.</p>
+      </header>
+      <div class="absolute right-0 top-0 flex items-center gap-2">
+        <span id="user-pill" class="hidden mr-2 rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600"></span>
+        <button id="btn-logout" class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm shadow-sm hover:bg-slate-50">Logout</button>
+      </div>
+    </div>
 
     <section class="mt-8 grid gap-3 md:grid-cols-[1fr_auto] md:items-center">
       <div class="flex items-center gap-2">
@@ -311,17 +195,8 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
       </div>
       <div class="mt-6 flex flex-wrap items-center gap-3">
         <a id="details-view" href="#" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">View ▶</a>
-
-        <!-- Join first; Leave appears only after joined -->
-        <button id="details-join"
-                class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-100">
-          Join Organization
-        </button>
-        <button id="details-leave"
-                class="hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700 hover:bg-rose-100">
-          Leave Organization
-        </button>
-
+        <button id="details-join"  class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-100">Join Organization</button>
+        <button id="details-leave" class="hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700 hover:bg-rose-100">Leave Organization</button>
         <button id="details-close2" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm">Close</button>
       </div>
     </div>
@@ -356,7 +231,7 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     </div>
   </div>
 
-  <!-- DETAIL PAGE (same file, toggled view) -->
+  <!-- DETAIL PAGE (same file) -->
   <main id="page-detail" class="page relative mx-auto max-w-6xl px-4 pb-20 pt-8 bg-grid">
     <a href="#" id="back" class="text-sm text-slate-500 hover:underline">◀ Back to Directory</a>
     <header class="mt-3 flex items-start justify-between gap-4">
@@ -382,69 +257,133 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
   </main>
 
   <script>
-    // ====== Data from the PDF (extracted & normalized) — no external assets ======
+    /* ---------------- AUTH JS ---------------- */
+    const pageAuth = document.getElementById('page-auth');
+    const pageDir  = document.getElementById('page-directory');
+    const pageDet  = document.getElementById('page-detail');
+    const logoutBtn = document.getElementById('btn-logout');
+    const userPill  = document.getElementById('user-pill');
+
+    // tabs
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const panels  = document.querySelectorAll('.tab-panel');
+    function activateTab(id){
+      panels.forEach(p => p.id === id ? p.classList.remove('hidden') : p.classList.add('hidden'));
+      tabBtns.forEach(b=>{
+        const on = b.dataset.target === id;
+        b.classList.toggle('bg-white', on);
+        b.classList.toggle('shadow', on);
+        b.classList.toggle('text-slate-900', on);
+        b.classList.toggle('text-slate-500', !on);
+      });
+    }
+    tabBtns.forEach(b=>b.addEventListener('click',()=>activateTab(b.dataset.target)));
+    document.querySelectorAll('[data-toggle]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();activateTab(a.dataset.toggle)}));
+    activateTab('panel-signin');
+
+    // show/hide password
+    document.querySelectorAll('.showpass').forEach(btn=>{
+      btn.addEventListener('click',()=>{
+        const id=btn.getAttribute('data-toggle-pass');
+        const el=document.getElementById(id);
+        const isPw=el.type==='password';
+        el.type=isPw?'text':'password';
+        btn.textContent=isPw?'Hide':'Show';
+      });
+    });
+
+    // fake "database"
+    const USERS_KEY='its_users';
+    function getUsers(){ try{return JSON.parse(localStorage.getItem(USERS_KEY)||'[]')}catch{return []} }
+    function saveUsers(arr){ localStorage.setItem(USERS_KEY, JSON.stringify(arr)); }
+    function setSessionUser(u, remember){
+      sessionStorage.setItem('its_user', u);
+      if (remember) localStorage.setItem('its_user_persist', u); else localStorage.removeItem('its_user_persist');
+    }
+    function getSessionUser(){
+      return sessionStorage.getItem('its_user') || localStorage.getItem('its_user_persist');
+    }
+
+    // toasts
+    function toast(msg){
+      const t=document.getElementById('toast');
+      t.textContent=msg; t.classList.remove('invisible');
+      requestAnimationFrame(()=>{ t.classList.remove('opacity-0'); t.classList.add('opacity-100'); });
+      setTimeout(()=>{ t.classList.add('opacity-0'); setTimeout(()=>t.classList.add('invisible'),300); },1800);
+    }
+
+    // sign in
+    document.getElementById('panel-signin').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const u=document.getElementById('si-username').value.trim();
+      const p=document.getElementById('si-password').value.trim();
+      if(!u||!p){ toast('Fill username & password'); return; }
+      const users=getUsers();
+      const ok = users.find(x=>x.u===u && x.p===p);
+      if(!ok){ toast('Account not found. Try Sign up.'); return; }
+      setSessionUser(u, document.getElementById('remember-me').checked);
+      enterDirectory(u);
+    });
+
+    // sign up
+    document.getElementById('panel-signup').addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const u=document.getElementById('su-username').value.trim();
+      const p=document.getElementById('su-password').value.trim();
+      const c=document.getElementById('su-confirm').value.trim();
+      if(!u||!p){ toast('Fill username & password'); return; }
+      if(p!==c){ document.getElementById('confirm-msg').classList.remove('hidden'); return; }
+      const users=getUsers();
+      if(users.some(x=>x.u===u)){ toast('Username already exists'); return; }
+      users.push({u,p}); saveUsers(users);
+      setSessionUser(u, true);
+      enterDirectory(u);
+    });
+
+    function enterDirectory(username){
+      // show directory
+      pageAuth.classList.remove('active'); pageAuth.style.display='none';
+      pageDet.classList.remove('active');  pageDet.style.display='none';
+      pageDir.classList.add('active');     pageDir.style.display='block';
+      // show username & render directory list
+      userPill.textContent = username; userPill.classList.remove('hidden');
+      initDirectory(); // from bottom
+      toast('Logged in');
+    }
+
+    function logout(){
+      sessionStorage.removeItem('its_user');
+      // keep localStorage persisted user only if you want auto-login; we clear to force login
+      localStorage.removeItem('its_user_persist');
+      // go back to auth
+      pageDir.classList.remove('active'); pageDir.style.display='none';
+      pageDet.classList.remove('active'); pageDet.style.display='none';
+      pageAuth.classList.add('active');   pageAuth.style.display='grid';
+      toast('Logged out');
+    }
+    logoutBtn.addEventListener('click', logout);
+
+    // auto enter if remembered
+    (function autoEnter(){
+      const u=getSessionUser();
+      if(u) enterDirectory(u);
+    })();
+
+    /* ---------------- DIRECTORY + DETAIL JS (your original) ---------------- */
     const CATEGORIES = ['Student Body','Religious','UKM – Arts','UKM – Sports','UKM – Martial Arts','UKM – Sci/Tech','Committee/Event','Others'];
 
     const NAMES = [
-      'Student Executive Board (BEM ITS)',
-      'Student Legislature (BLM ITS)',
-      'Student Court (Mahkamah Mahasiswa ITS)',
-      'Manarul Ilmi Mosque Community (Islam)',
-      'Catholic Student Community St. Ignatius Loyola',
-      'ITS Buddhist Development Team',
-      'ITS Hindu Spiritual Development Team',
-      'Photography Club (UKAFO)',
-      'Rebana Music Club (Cinta Rebana)',
-      'Music Club',
-      'ITS Student Choir (PSM ITS)',
-      'Dancing Club (traditional/modern dance, karawitan)',
-      'Theater Club (Tiyang Alit Theatre)',
-      'Victory Sepuluh Nopember Marching Corps (VSNMC)',
-      'CLICK (Film & Cinematography Club)',
-      'Siklus Club (outdoor & environmental)',
-      'Scout Club (Pramuka ITS)',
-      'Student Regiment (MENWA 802 ITS)',
-      'PMR / First-Aid (KSR PMI) Club',
-      'Astronomy Club',
-      'Robotics Club',
-      'Reasoning Clubs',
-      'Maritime Challenge',
-      'IFLS (Language & Culture Club)',
-      'Journalism Club (LPM 1.0)',
-      'Model United Nations Club (ITS MUN Club)',
-      'Student Cooperative “Kopma Dr. Angka”',
-      'Muaythai Club (ITS Muaythai Association/IMA)',
-      'PSHT Club (Persaudaraan Setia Hati Terate)',
-      'Merpati Putih Club',
-      'Shorinji Kempo Club',
-      'Taekwondo Club',
-      'Karate-Do Club',
-      'Kendo Club',
-      'Basketball Club',
-      'Football (Soccer) Club',
-      'Bridge Club',
-      'Badminton Club',
-      'Tennis Club',
-      'Billiards Club',
-      'Chess Club',
-      'Futsal Club',
-      'Softball Club (“Stingray”)',
-      'Archery Club (INARCO)',
-      'Flag Football Club (“Seaborg”)',
-      'Volleyball Club',
-      'INI LHO ITS! (ILITS) – Open Campus',
-      'GERIGI ITS (Generasi Integralistik)',
-      'GEREX (Gerigi × UKM EXPO)',
-      'UKM EXPO ITS',
-      'MABA CUP ITS',
-      'POMITS (Pekan Olahraga Mahasiswa ITS)',
-      'ITS EXPO',
-      'ITS Career Fair / ITS Job Fair (BKI)',
-      'ITS PKM League (Liga PKM ITS)',
-      'SCHEMATICS ITS',
-      'CIVEX / Civil Expo ITS',
-      'Computer & Electrical Engineering Expo',
-      'Ramadan on Campus (RDK ITS)'
+      'Student Executive Board (BEM ITS)','Student Legislature (BLM ITS)','Student Court (Mahkamah Mahasiswa ITS)',
+      'Manarul Ilmi Mosque Community (Islam)','Catholic Student Community St. Ignatius Loyola','ITS Buddhist Development Team','ITS Hindu Spiritual Development Team',
+      'Photography Club (UKAFO)','Rebana Music Club (Cinta Rebana)','Music Club','ITS Student Choir (PSM ITS)',
+      'Dancing Club (traditional/modern dance, karawitan)','Theater Club (Tiyang Alit Theatre)','Victory Sepuluh Nopember Marching Corps (VSNMC)',
+      'CLICK (Film & Cinematography Club)','Siklus Club (outdoor & environmental)','Scout Club (Pramuka ITS)','Student Regiment (MENWA 802 ITS)',
+      'PMR / First-Aid (KSR PMI) Club','Astronomy Club','Robotics Club','Reasoning Clubs','Maritime Challenge','IFLS (Language & Culture Club)',
+      'Journalism Club (LPM 1.0)','Model United Nations Club (ITS MUN Club)','Student Cooperative “Kopma Dr. Angka”',
+      'Muaythai Club (ITS Muaythai Association/IMA)','PSHT Club (Persaudaraan Setia Hati Terate)','Merpati Putih Club','Shorinji Kempo Club','Taekwondo Club','Karate-Do Club','Kendo Club',
+      'Basketball Club','Football (Soccer) Club','Bridge Club','Badminton Club','Tennis Club','Billiards Club','Chess Club','Futsal Club','Softball Club (“Stingray”)','Archery Club (INARCO)','Flag Football Club (“Seaborg”)','Volleyball Club',
+      'INI LHO ITS! (ILITS) – Open Campus','GERIGI ITS (Generasi Integralistik)','GEREX (Gerigi × UKM EXPO)','UKM EXPO ITS','MABA CUP ITS','POMITS (Pekan Olahraga Mahasiswa ITS)','ITS EXPO',
+      'ITS Career Fair / ITS Job Fair (BKI)','ITS PKM League (Liga PKM ITS)','SCHEMATICS ITS','CIVEX / Civil Expo ITS','Computer & Electrical Engineering Expo','Ramadan on Campus (RDK ITS)'
     ];
 
     function inferTags(name){
@@ -474,15 +413,11 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     }
 
     const ORGS = NAMES.map((name, idx)=>({
-      id: idx+1,
-      name,
-      desc: makeDesc(name),
-      tags: inferTags(name),
-      featured: Math.random()<0.2,
-      joined: false
+      id: idx+1, name, desc: makeDesc(name), tags: inferTags(name),
+      featured: Math.random()<0.2, joined: false
     }));
 
-    // ====== Directory state & UI ======
+    // ------- directory refs
     const grid = document.getElementById('grid');
     const searchInput = document.getElementById('search');
     const btnFilter = document.getElementById('btn-filter');
@@ -514,7 +449,7 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
 
     const state = { page:1, perPage:9, search:'', selected:new Set(), featuredOnly:false, showOnlyYours:false };
 
-    // Build filters and chips
+    // Build filters/chips
     CATEGORIES.forEach(cat=>{
       const item=document.createElement('label');
       item.className='inline-flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-2 text-sm';
@@ -531,7 +466,6 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     }
     quickTags.appendChild(chip('All',()=>{state.selected.clear(); state.search=''; state.featuredOnly=false; applyAndRender();},true));
     CATEGORIES.forEach(cat=>quickTags.appendChild(chip(cat,()=>{state.selected=new Set([cat]);applyAndRender();})));
-
     CATEGORIES.forEach(cat=>{
       const label=document.createElement('label');
       label.className='inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-sm';
@@ -585,7 +519,6 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     }
     function applyAndRender(){state.page=1;render();}
 
-    // Events
     document.addEventListener('click', (e)=>{
       const star=e.target.closest('[data-star]');
       if(star){
@@ -603,68 +536,44 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     searchInput.addEventListener('input', e=>{state.search=e.target.value.trim(); applyAndRender();});
     toggleFeatured.addEventListener('change', e=>{state.featuredOnly=e.target.checked; applyAndRender();});
     btnFilter.addEventListener('click', ()=>filterCard.classList.toggle('hidden'));
-    filterClear.addEventListener('click', ()=>{
-      state.selected.clear();
-      [...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>cb.checked=false);
-    });
-    filterApply.addEventListener('click', ()=>{
-      state.selected.clear();
-      [...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>{if(cb.checked) state.selected.add(cb.value);});
-      filterCard.classList.add('hidden'); applyAndRender();
-    });
-    prevBtn.addEventListener('click', ()=>{if(state.page>1){state.page--; render();}});
-    nextBtn.addEventListener('click', ()=>{state.page++; render();});
+    filterClear.addEventListener('click', ()=>{state.selected.clear();[...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>cb.checked=false);});
+    filterApply.addEventListener('click', ()=>{state.selected.clear();[...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>{if(cb.checked) state.selected.add(cb.value);}); filterCard.classList.add('hidden'); applyAndRender();});
 
-    // Create modal
-    function show(el){el.classList.remove('invisible'); el.classList.remove('opacity-0');}
-    function hide(el){el.classList.add('opacity-0'); setTimeout(()=>el.classList.add('invisible'),150);}
-    openCreate.addEventListener('click', ()=>show(modal));
-    closeModal.addEventListener('click', ()=>hide(modal));
-    cancelCreate.addEventListener('click', ()=>hide(modal));
-    createForm.addEventListener('submit', (e)=>{
+    const openCreateModal = ()=>{ modal.classList.remove('invisible'); modal.classList.remove('opacity-0'); };
+    const closeCreateModal= ()=>{ modal.classList.add('opacity-0'); setTimeout(()=>modal.classList.add('invisible'),150); };
+    openCreate.addEventListener('click', openCreateModal);
+    closeModal.addEventListener('click', closeCreateModal);
+    cancelCreate.addEventListener('click', closeCreateModal);
+    createForm.addEventListener('submit',(e)=>{
       e.preventDefault();
       const f=new FormData(createForm);
-      const name=(f.get('name')||'').toString().trim();
-      if(!name) return;
+      const name=(f.get('name')||'').toString().trim(); if(!name) return;
       const desc=(f.get('desc')||'').toString();
       const featured=!!f.get('featured');
       const tags=[...createCats.querySelectorAll('input:checked')].map(i=>i.value);
       ORGS.push({id:Date.now(), name, desc:desc||'Student-created organization.', tags: tags.length?tags:['Others'], featured, owner:'you', joined:false});
       createForm.reset();[...createCats.querySelectorAll('input')].forEach(i=>i.checked=false);
-      hide(modal); applyAndRender();
+      closeCreateModal(); applyAndRender();
     });
 
-    // Details modal logic (no deletion on Leave)
+    // Details modal
     function openDetails(org){
       if(!org) return;
       detailsTitle.textContent=org.name;
       detailsDesc.textContent=org.desc||'';
-
       detailsJoin.classList.toggle('hidden',  org.joined);
       detailsLeave.classList.toggle('hidden', !org.joined);
-
-      detailsView.onclick=(e)=>{ e.preventDefault(); goDetail(org.id); hide(detailsModal); };
-
-      detailsJoin.onclick=()=>{
-        org.joined = true;
-        detailsJoin.classList.add('hidden');
-        detailsLeave.classList.remove('hidden');
-      };
-
-      detailsLeave.onclick=()=>{
-        org.joined = false;
-        hide(detailsModal);
-        render();
-      };
-
-      show(detailsModal);
+      detailsView.onclick=(e)=>{ e.preventDefault(); goDetail(org.id); modalHide(detailsModal); };
+      detailsJoin.onclick=()=>{ org.joined=true; detailsJoin.classList.add('hidden'); detailsLeave.classList.remove('hidden'); };
+      detailsLeave.onclick=()=>{ org.joined=false; modalHide(detailsModal); render(); };
+      modalShow(detailsModal);
     }
-    detailsClose.addEventListener('click', ()=>hide(detailsModal));
-    detailsClose2.addEventListener('click', ()=>hide(detailsModal));
+    const modalShow=(el)=>{ el.classList.remove('invisible'); el.classList.remove('opacity-0'); };
+    const modalHide=(el)=>{ el.classList.add('opacity-0'); setTimeout(()=>el.classList.add('invisible'),150); };
+    detailsClose.addEventListener('click', ()=>modalHide(detailsModal));
+    detailsClose2.addEventListener('click', ()=>modalHide(detailsModal));
 
-    // ====== Detail page logic (same file) ======
-    const pageDir=document.getElementById('page-directory');
-    const pageDet=document.getElementById('page-detail');
+    // Detail page
     const back=document.getElementById('back');
     const orgTitle=document.getElementById('org-title');
     const orgDesc=document.getElementById('org-desc');
@@ -677,7 +586,6 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     const first=['Ayu','Dika','Rama','Salsa','Bima','Nadia','Rizky','Naufal','Daffa','Fajar','Icha','Adit','Siti','Bagas','Kevin','Lala','Dewi','Rani','Iqbal','Gita'];
     const last=['Pratama','Putri','Saputra','Wibowo','Santoso','Wijaya','Permata','Ananda','Hidayat','Nugroho','Cahyani','Pangestu','Rahma','Septian','Maulana','Wardani'];
     function randName(){ return first[Math.floor(Math.random()*first.length)]+' '+last[Math.floor(Math.random()*last.length)]; }
-
     function silverTag(){return '<span class="inline-flex items-center rounded-full border border-slate-200 bg-slate-100 px-2 py-0.5 text-xs text-slate-600">Members</span>';}
     function yellowTag(){return '<span class="inline-flex items-center rounded-full border border-yellow-200 bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800">Leader</span>';}
 
@@ -686,36 +594,28 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     function goDetail(id){
       const org = ORGS.find(o => o.id === id);
       if (!org) return;
-
       detailState.currentId = id;
 
-      pageDir.classList.remove('active');  pageDir.style.display = 'none';
-      pageDet.classList.add('active');     pageDet.style.display = 'block';
+      pageDir.classList.remove('active'); pageDir.style.display='none';
+      pageDet.classList.add('active');    pageDet.style.display='block';
 
       orgTitle.textContent = org.name;
       orgDesc.textContent  = org.desc || '';
       starBtn.textContent  = org.featured ? '★' : '☆';
 
-      // sync join state
       detailState.joined   = !!org.joined;
       joinBtn.textContent  = detailState.joined ? 'Leave' : 'Join';
 
-      // fresh roster with one leader
+      // fresh roster with single leader
       detailState.page = 1;
       const count = 18, leaderIndex = Math.floor(Math.random()*count);
-      detailState.roster = Array.from({length: count}, (_, i)=>({
-        name: randName(), role: i===leaderIndex ? 'leader' : 'member'
-      }));
+      detailState.roster = Array.from({length: count}, (_, i)=>({name: randName(), role: i===leaderIndex ? 'leader' : 'member'}));
 
       renderMembers();
       renderEvents(org);
     }
-    function backToDir(){
-      pageDet.classList.remove('active'); pageDet.style.display='none';
-      pageDir.classList.add('active');    pageDir.style.display='block';
-      render();
-    }
-    back.addEventListener('click', (e)=>{e.preventDefault(); backToDir();});
+    function backToDir(e){ if(e) e.preventDefault(); pageDet.classList.remove('active'); pageDet.style.display='none'; pageDir.classList.add('active'); pageDir.style.display='block'; render(); }
+    back.addEventListener('click', backToDir);
 
     function memberCard(m){
       return `<article class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
@@ -739,13 +639,8 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
         pager.appendChild(b);
       }
     }
-
     function renderEvents(org){
-      const base=[
-        {date:'12 Nov', title:'Open House / Q&A', where:'Main Hall'},
-        {date:'18 Nov', title:'Weekly Activity',  where:'Campus Area'},
-        {date:'05 Dec', title:'Showcase / Tournament', where:'Auditorium / GOR'}
-      ];
+      const base=[{date:'12 Nov', title:'Open House / Q&A', where:'Main Hall'},{date:'18 Nov', title:'Weekly Activity',  where:'Campus Area'},{date:'05 Dec', title:'Showcase / Tournament', where:'Auditorium / GOR'}];
       eventsWrap.innerHTML=base.map(e=>`
         <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <div class="text-sm text-slate-500">${e.date}</div>
@@ -753,31 +648,17 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
           <div class="text-sm text-slate-600">Location: ${e.where}</div>
         </article>`).join('');
     }
+    starBtn.addEventListener('click', ()=>{ const org=ORGS.find(o=>o.id===detailState.currentId); if(!org) return; org.featured=!org.featured; starBtn.textContent=org.featured?'★':'☆'; });
+    joinBtn.addEventListener('click', ()=>{ detailState.joined = !detailState.joined; joinBtn.textContent = detailState.joined ? 'Leave' : 'Join'; const o = ORGS.find(x=>x.id === detailState.currentId); if (o) o.joined = detailState.joined; });
 
-    starBtn.addEventListener('click', ()=>{
-      const org=ORGS.find(o=>o.id===detailState.currentId);
-      if(!org) return;
-      org.featured=!org.featured;
-      starBtn.textContent=org.featured?'★':'☆';
-    });
-
-    joinBtn.addEventListener('click', ()=>{
-      detailState.joined = !detailState.joined;
-      joinBtn.textContent = detailState.joined ? 'Leave' : 'Join';
-      const o = ORGS.find(x=>x.id === detailState.currentId);
-      if (o) o.joined = detailState.joined;
-    });
-
-    // Initial paint – ensure first load shows everything
-    window.addEventListener('DOMContentLoaded', ()=>{
-      state.selected.clear();
-      state.search = '';
-      state.featuredOnly = false;
-      state.page = 1;
-      render();
-    });
+    // -------- Robust initial paint for directory (called when entering after login) --------
+    function initDirectory() {
+      state.selected.clear(); state.search=''; state.featuredOnly=false; state.page=1; render();
+    }
   </script>
 </body>
 </html>
 
+
 ```
+
