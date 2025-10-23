@@ -225,7 +225,7 @@ Its Orgs – Auth Page (frontend).html (login)
 ```
 Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
 
-```
+``` html
 <!doctype html>
 <html lang="en">
 <head>
