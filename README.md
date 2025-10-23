@@ -240,7 +240,7 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     tailwind.config = { theme:{ extend:{
       fontFamily:{ display:['Playfair Display','serif'], sans:['Inter','system-ui','sans-serif'] },
       colors:{ brand:{50:'#f5f7ff',100:'#eef2ff',200:'#e0e7ff',300:'#c7d2fe',400:'#a5b4fc',500:'#818cf8',600:'#6366f1',700:'#4f46e5',800:'#4338ca',900:'#3730a3'} }
-    }}};
+    }}}; 
   </script>
   <style>
     .bg-grid{background-image:radial-gradient(circle at 1px 1px, rgba(99,102,241,.14) 1px, transparent 0);background-size:22px 22px}
@@ -311,7 +311,17 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
       </div>
       <div class="mt-6 flex flex-wrap items-center gap-3">
         <a id="details-view" href="#" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700">View ▶</a>
-        <button id="details-leave" class="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700 hover:bg-rose-100">Leave Organization</button>
+
+        <!-- Join first; Leave appears only after joined -->
+        <button id="details-join"
+                class="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm text-emerald-700 hover:bg-emerald-100">
+          Join Organization
+        </button>
+        <button id="details-leave"
+                class="hidden rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm text-rose-700 hover:bg-rose-100">
+          Leave Organization
+        </button>
+
         <button id="details-close2" class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm">Close</button>
       </div>
     </div>
@@ -463,7 +473,14 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
       return 'Student organization/club with regular gatherings and programs.';
     }
 
-    const ORGS = NAMES.map((name, idx)=>({ id: idx+1, name, desc: makeDesc(name), tags: inferTags(name), featured: Math.random()<0.2 }));
+    const ORGS = NAMES.map((name, idx)=>({
+      id: idx+1,
+      name,
+      desc: makeDesc(name),
+      tags: inferTags(name),
+      featured: Math.random()<0.2,
+      joined: false
+    }));
 
     // ====== Directory state & UI ======
     const grid = document.getElementById('grid');
@@ -492,6 +509,7 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     const detailsTitle = document.getElementById('details-title');
     const detailsDesc = document.getElementById('details-desc');
     const detailsView = document.getElementById('details-view');
+    const detailsJoin  = document.getElementById('details-join');
     const detailsLeave = document.getElementById('details-leave');
 
     const state = { page:1, perPage:9, search:'', selected:new Set(), featuredOnly:false, showOnlyYours:false };
@@ -503,15 +521,30 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
       item.innerHTML=`<input type="checkbox" value="${cat}" class="rounded border-slate-300 text-brand-600 focus:ring-brand-600"> ${cat}`;
       filtersWrap.appendChild(item);
     });
-    function chip(text,onClick,active){const a=document.createElement('button');a.type='button';a.textContent=text;a.className='rounded-full border border-slate-200 bg-white px-3 py-1 text-xs shadow-sm hover:bg-slate-50'; if(active) a.classList.add('ring-1','ring-brand-200'); a.addEventListener('click',onClick); return a;}
-    quickTags.appendChild(chip('All',()=>{state.selected.clear();applyAndRender();},true));
+    function chip(text,onClick,active){
+      const a=document.createElement('button');
+      a.type='button'; a.textContent=text;
+      a.className='rounded-full border border-slate-200 bg-white px-3 py-1 text-xs shadow-sm hover:bg-slate-50';
+      if(active) a.classList.add('ring-1','ring-brand-200');
+      a.addEventListener('click',onClick);
+      return a;
+    }
+    quickTags.appendChild(chip('All',()=>{state.selected.clear(); state.search=''; state.featuredOnly=false; applyAndRender();},true));
     CATEGORIES.forEach(cat=>quickTags.appendChild(chip(cat,()=>{state.selected=new Set([cat]);applyAndRender();})));
 
-    CATEGORIES.forEach(cat=>{const label=document.createElement('label');label.className='inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-sm';label.innerHTML=`<input type="checkbox" value="${cat}" class="rounded border-slate-300 text-brand-600 focus:ring-brand-600"> ${cat}`;createCats.appendChild(label)});
+    CATEGORIES.forEach(cat=>{
+      const label=document.createElement('label');
+      label.className='inline-flex items-center gap-2 rounded-full border border-slate-200 px-3 py-1 text-sm';
+      label.innerHTML=`<input type="checkbox" value="${cat}" class="rounded border-slate-300 text-brand-600 focus:ring-brand-600"> ${cat}`;
+      createCats.appendChild(label)
+    });
 
     function getFiltered(){
       let list=[...ORGS];
-      if(state.search){const q=state.search.toLowerCase();list=list.filter(o=>o.name.toLowerCase().includes(q)||(o.desc||'').toLowerCase().includes(q)||(o.tags||[]).some(t=>t.toLowerCase().includes(q)));}
+      if(state.search){
+        const q=state.search.toLowerCase();
+        list=list.filter(o=>o.name.toLowerCase().includes(q)||(o.desc||'').toLowerCase().includes(q)||(o.tags||[]).some(t=>t.toLowerCase().includes(q)));
+      }
       if(state.selected.size) list=list.filter(o=>o.tags.some(t=>state.selected.has(t)));
       if(state.featuredOnly) list=list.filter(o=>o.featured);
       if(state.showOnlyYours) list=list.filter(o=>o.owner==='you');
@@ -519,36 +552,66 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     }
     function cardHTML(o){
       const tags=(o.tags||[]).map(t=>`<span class="inline-flex items-center rounded-full border border-slate-200 px-2 py-0.5 text-xs">${t}</span>`).join(' ');
-      return `<article class=\"relative rounded-3xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md\">
-        <button title=\"Toggle featured\" data-star=\"${o.id}\" class=\"absolute right-3 top-3 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs\">${o.featured?'★':'☆'}<\/button>
-        <h3 class=\"text-lg font-semibold text-slate-900\">${o.name}<\/h3>
-        <div class=\"mt-2 flex flex-wrap gap-1\">${tags}<\/div>
-        <p class=\"mt-3 text-sm text-slate-600 clamp-2\">${o.desc||''}<\/p>
-        <div class=\"mt-4 flex items-center justify-between\">
-          <button class=\"rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm hover:bg-slate-50\" data-view=\"${o.id}\">View details<\/button>
-          ${o.owner==='you'?'<span class=\"text-xs text-slate-400\">owned by you<\/span>':''}
-        <\/div>
-      <\/article>`;
+      return `<article class="relative rounded-3xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md">
+        <button title="Toggle featured" data-star="${o.id}" class="absolute right-3 top-3 rounded-full border border-slate-200 bg-white px-2 py-0.5 text-xs">${o.featured?'★':'☆'}</button>
+        <h3 class="text-lg font-semibold text-slate-900">${o.name}</h3>
+        <div class="mt-2 flex flex-wrap gap-1">${tags}</div>
+        <p class="mt-3 text-sm text-slate-600 clamp-2">${o.desc||''}</p>
+        <div class="mt-4 flex items-center justify-between">
+          <button class="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm hover:bg-slate-50" data-view="${o.id}">View details</button>
+          ${o.owner==='you'?'<span class="text-xs text-slate-400">owned by you</span>':''}
+        </div>
+      </article>`;
     }
     function render(){
       const list=getFiltered();
       const totalPages=Math.max(1,Math.ceil(list.length/state.perPage));
       if(state.page>totalPages) state.page=totalPages;
-      const start=(state.page-1)*state.perPage; const pageItems=list.slice(start,start+state.perPage);
+      const start=(state.page-1)*state.perPage;
+      const pageItems=list.slice(start,start+state.perPage);
       grid.innerHTML=pageItems.map(cardHTML).join('');
-      prevBtn.disabled=state.page===1; nextBtn.disabled=state.page===totalPages; pagesWrap.innerHTML='';
-      for(let i=1;i<=totalPages;i++){const b=document.createElement('button'); b.textContent=i; b.className='h-9 w-9 rounded-lg border border-slate-200 bg-white text-sm shadow-sm hover:bg-slate-50'; if(i===state.page) b.classList.add('bg-brand-600','text-white','border-brand-600'); b.addEventListener('click',()=>{state.page=i;render();}); pagesWrap.appendChild(b);} }
+
+      prevBtn.disabled=state.page===1;
+      nextBtn.disabled=state.page===totalPages;
+      pagesWrap.innerHTML='';
+      for(let i=1;i<=totalPages;i++){
+        const b=document.createElement('button');
+        b.textContent=i;
+        b.className='h-9 w-9 rounded-lg border border-slate-200 bg-white text-sm shadow-sm hover:bg-slate-50';
+        if(i===state.page) b.classList.add('bg-brand-600','text-white','border-brand-600');
+        b.addEventListener('click',()=>{state.page=i;render();});
+        pagesWrap.appendChild(b);
+      }
+    }
     function applyAndRender(){state.page=1;render();}
 
     // Events
     document.addEventListener('click', (e)=>{
-      const star=e.target.closest('[data-star]'); if(star){const id=Number(star.getAttribute('data-star')); const idx=ORGS.findIndex(o=>o.id===id); if(idx>-1){ORGS[idx].featured=!ORGS[idx].featured; render();}}
-      const view=e.target.closest('[data-view]'); if(view){const id=Number(view.getAttribute('data-view')); const org=ORGS.find(o=>o.id===id); openDetails(org);} });
+      const star=e.target.closest('[data-star]');
+      if(star){
+        const id=Number(star.getAttribute('data-star'));
+        const idx=ORGS.findIndex(o=>o.id===id);
+        if(idx>-1){ORGS[idx].featured=!ORGS[idx].featured; render();}
+      }
+      const view=e.target.closest('[data-view]');
+      if(view){
+        const id=Number(view.getAttribute('data-view'));
+        const org=ORGS.find(o=>o.id===id);
+        openDetails(org);
+      }
+    });
     searchInput.addEventListener('input', e=>{state.search=e.target.value.trim(); applyAndRender();});
     toggleFeatured.addEventListener('change', e=>{state.featuredOnly=e.target.checked; applyAndRender();});
     btnFilter.addEventListener('click', ()=>filterCard.classList.toggle('hidden'));
-    filterClear.addEventListener('click', ()=>{state.selected.clear();[...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>cb.checked=false);});
-    filterApply.addEventListener('click', ()=>{state.selected.clear();[...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>{if(cb.checked) state.selected.add(cb.value);}); filterCard.classList.add('hidden'); applyAndRender();});
+    filterClear.addEventListener('click', ()=>{
+      state.selected.clear();
+      [...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>cb.checked=false);
+    });
+    filterApply.addEventListener('click', ()=>{
+      state.selected.clear();
+      [...filtersWrap.querySelectorAll('input[type=checkbox]')].forEach(cb=>{if(cb.checked) state.selected.add(cb.value);});
+      filterCard.classList.add('hidden'); applyAndRender();
+    });
     prevBtn.addEventListener('click', ()=>{if(state.page>1){state.page--; render();}});
     nextBtn.addEventListener('click', ()=>{state.page++; render();});
 
@@ -558,10 +621,44 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
     openCreate.addEventListener('click', ()=>show(modal));
     closeModal.addEventListener('click', ()=>hide(modal));
     cancelCreate.addEventListener('click', ()=>hide(modal));
-    createForm.addEventListener('submit', (e)=>{e.preventDefault(); const f=new FormData(createForm); const name=(f.get('name')||'').toString().trim(); if(!name) return; const desc=(f.get('desc')||'').toString(); const featured=!!f.get('featured'); const tags=[...createCats.querySelectorAll('input:checked')].map(i=>i.value); ORGS.push({id:Date.now(), name, desc:desc||'Student-created organization.', tags: tags.length?tags:['Others'], featured, owner:'you'}); createForm.reset();[...createCats.querySelectorAll('input')].forEach(i=>i.checked=false); hide(modal); applyAndRender();});
+    createForm.addEventListener('submit', (e)=>{
+      e.preventDefault();
+      const f=new FormData(createForm);
+      const name=(f.get('name')||'').toString().trim();
+      if(!name) return;
+      const desc=(f.get('desc')||'').toString();
+      const featured=!!f.get('featured');
+      const tags=[...createCats.querySelectorAll('input:checked')].map(i=>i.value);
+      ORGS.push({id:Date.now(), name, desc:desc||'Student-created organization.', tags: tags.length?tags:['Others'], featured, owner:'you', joined:false});
+      createForm.reset();[...createCats.querySelectorAll('input')].forEach(i=>i.checked=false);
+      hide(modal); applyAndRender();
+    });
 
-    // Details modal -> Detail page
-    function openDetails(org){ if(!org) return; detailsTitle.textContent=org.name; detailsDesc.textContent=org.desc||''; detailsView.onclick=(e)=>{ e.preventDefault(); goDetail(org.id); hide(detailsModal);}; detailsLeave.onclick=()=>{ const idx=ORGS.findIndex(o=>o.id===org.id); if(idx>-1) ORGS.splice(idx,1); hide(detailsModal); render(); }; show(detailsModal); }
+    // Details modal logic (no deletion on Leave)
+    function openDetails(org){
+      if(!org) return;
+      detailsTitle.textContent=org.name;
+      detailsDesc.textContent=org.desc||'';
+
+      detailsJoin.classList.toggle('hidden',  org.joined);
+      detailsLeave.classList.toggle('hidden', !org.joined);
+
+      detailsView.onclick=(e)=>{ e.preventDefault(); goDetail(org.id); hide(detailsModal); };
+
+      detailsJoin.onclick=()=>{
+        org.joined = true;
+        detailsJoin.classList.add('hidden');
+        detailsLeave.classList.remove('hidden');
+      };
+
+      detailsLeave.onclick=()=>{
+        org.joined = false;
+        hide(detailsModal);
+        render();
+      };
+
+      show(detailsModal);
+    }
     detailsClose.addEventListener('click', ()=>hide(detailsModal));
     detailsClose2.addEventListener('click', ()=>hide(detailsModal));
 
@@ -586,20 +683,99 @@ Its Orgs – Directory Page (frontend).html  (single-file directory + detail)
 
     const detailState={ page:1, perPage:9, currentId:null, roster:[], joined:false };
 
-    function goDetail(id){ detailState.currentId=id; const org=ORGS.find(o=>o.id===id); if(!org) return; pageDir.classList.remove('active'); pageDir.style.display='none'; pageDet.classList.add('active'); pageDet.style.display='block'; orgTitle.textContent=org.name; orgDesc.textContent=org.desc||''; starBtn.textContent=org.featured?'★':'☆'; detailState.roster=Array.from({length:18},()=>({name:randName(), role:'member'})); detailState.roster[Math.floor(Math.random()*detailState.roster.length)]={name:randName(), role:'leader'}; renderMembers(); renderEvents(org); }
-    function backToDir(){ pageDet.classList.remove('active'); pageDet.style.display='none'; pageDir.classList.add('active'); pageDir.style.display='block'; render(); }
+    function goDetail(id){
+      const org = ORGS.find(o => o.id === id);
+      if (!org) return;
+
+      detailState.currentId = id;
+
+      pageDir.classList.remove('active');  pageDir.style.display = 'none';
+      pageDet.classList.add('active');     pageDet.style.display = 'block';
+
+      orgTitle.textContent = org.name;
+      orgDesc.textContent  = org.desc || '';
+      starBtn.textContent  = org.featured ? '★' : '☆';
+
+      // sync join state
+      detailState.joined   = !!org.joined;
+      joinBtn.textContent  = detailState.joined ? 'Leave' : 'Join';
+
+      // fresh roster with one leader
+      detailState.page = 1;
+      const count = 18, leaderIndex = Math.floor(Math.random()*count);
+      detailState.roster = Array.from({length: count}, (_, i)=>({
+        name: randName(), role: i===leaderIndex ? 'leader' : 'member'
+      }));
+
+      renderMembers();
+      renderEvents(org);
+    }
+    function backToDir(){
+      pageDet.classList.remove('active'); pageDet.style.display='none';
+      pageDir.classList.add('active');    pageDir.style.display='block';
+      render();
+    }
     back.addEventListener('click', (e)=>{e.preventDefault(); backToDir();});
 
-    function memberCard(m){ return `<article class=\"rounded-2xl border border-slate-200 bg-white p-3 shadow-sm\"><div class=\"font-medium\">${m.name}<\/div><div class=\"mt-2\">${m.role==='leader'?yellowTag():silverTag()}<\/div></article>`; }
-    function renderMembers(){ const total=Math.max(1,Math.ceil(detailState.roster.length/detailState.perPage)); if(detailState.page>total) detailState.page=total; const s=(detailState.page-1)*detailState.perPage; const items=detailState.roster.slice(s,s+detailState.perPage); membersWrap.innerHTML=items.map(memberCard).join(''); pager.innerHTML=''; for(let i=1;i<=total;i++){ const b=document.createElement('button'); b.textContent=i; b.className='h-9 w-9 rounded-lg border border-slate-200 bg-white text-sm shadow-sm hover:bg-slate-50'; if(i===detailState.page) b.classList.add('bg-brand-600','text-white','border-brand-600'); b.addEventListener('click',()=>{detailState.page=i; renderMembers();}); pager.appendChild(b);} }
+    function memberCard(m){
+      return `<article class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div class="font-medium">${m.name}</div>
+        <div class="mt-2">${m.role==='leader'?yellowTag():silverTag()}</div>
+      </article>`;
+    }
+    function renderMembers(){
+      const total=Math.max(1,Math.ceil(detailState.roster.length/detailState.perPage));
+      if(detailState.page>total) detailState.page=total;
+      const s=(detailState.page-1)*detailState.perPage;
+      const items=detailState.roster.slice(s,s+detailState.perPage);
+      membersWrap.innerHTML=items.map(memberCard).join('');
+      pager.innerHTML='';
+      for(let i=1;i<=total;i++){
+        const b=document.createElement('button');
+        b.textContent=i;
+        b.className='h-9 w-9 rounded-lg border border-slate-200 bg-white text-sm shadow-sm hover:bg-slate-50';
+        if(i===detailState.page) b.classList.add('bg-brand-600','text-white','border-brand-600');
+        b.addEventListener('click',()=>{detailState.page=i; renderMembers();});
+        pager.appendChild(b);
+      }
+    }
 
-    function renderEvents(org){ const base=[{date:'12 Nov', title:'Open House / Q&A', where:'Main Hall'},{date:'18 Nov', title:'Weekly Activity', where:'Campus Area'},{date:'05 Dec', title:'Showcase / Tournament', where:'Auditorium / GOR'}]; eventsWrap.innerHTML=base.map(e=>`<article class=\"rounded-2xl border border-slate-200 bg-white p-4 shadow-sm\"><div class=\"text-sm text-slate-500\">${e.date}<\/div><div class=\"mt-1 font-medium\">${org.name}: ${e.title}<\/div><div class=\"text-sm text-slate-600\">Location: ${e.where}<\/div></article>`).join(''); }
+    function renderEvents(org){
+      const base=[
+        {date:'12 Nov', title:'Open House / Q&A', where:'Main Hall'},
+        {date:'18 Nov', title:'Weekly Activity',  where:'Campus Area'},
+        {date:'05 Dec', title:'Showcase / Tournament', where:'Auditorium / GOR'}
+      ];
+      eventsWrap.innerHTML=base.map(e=>`
+        <article class="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <div class="text-sm text-slate-500">${e.date}</div>
+          <div class="mt-1 font-medium">${org.name}: ${e.title}</div>
+          <div class="text-sm text-slate-600">Location: ${e.where}</div>
+        </article>`).join('');
+    }
 
-    starBtn.addEventListener('click', ()=>{ const org=ORGS.find(o=>o.id===detailState.currentId); if(!org) return; org.featured=!org.featured; starBtn.textContent=org.featured?'★':'☆'; });
-    joinBtn.addEventListener('click', ()=>{ detailState.joined=!detailState.joined; joinBtn.textContent=detailState.joined?'Leave':'Join'; });
+    starBtn.addEventListener('click', ()=>{
+      const org=ORGS.find(o=>o.id===detailState.currentId);
+      if(!org) return;
+      org.featured=!org.featured;
+      starBtn.textContent=org.featured?'★':'☆';
+    });
 
-    // Initial paint
-    render();
+    joinBtn.addEventListener('click', ()=>{
+      detailState.joined = !detailState.joined;
+      joinBtn.textContent = detailState.joined ? 'Leave' : 'Join';
+      const o = ORGS.find(x=>x.id === detailState.currentId);
+      if (o) o.joined = detailState.joined;
+    });
+
+    // Initial paint – ensure first load shows everything
+    window.addEventListener('DOMContentLoaded', ()=>{
+      state.selected.clear();
+      state.search = '';
+      state.featuredOnly = false;
+      state.page = 1;
+      render();
+    });
   </script>
 </body>
 </html>
